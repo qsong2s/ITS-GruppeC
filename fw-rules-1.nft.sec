@@ -1,0 +1,71 @@
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+# Interface client network
+define if_clt_net = eth1
+
+# Interface server network
+define if_srv_net = eth0
+
+# Interface external network
+define if_ext = eth2
+
+# Client address
+define addr_ap1 = 172.16.56.101
+
+# Firewall, address of client side
+define addr_fw_clt = 172.16.56.100
+
+# Firewall, address of server side
+define addr_fw_srv = 172.16.57.100
+
+# Server address
+define addr_srv = 172.16.57.102
+
+table fw_work {
+
+  chain log_input_hook {
+    type filter hook input priority 0
+    policy accept
+    log prefix "INPUT "
+  }
+
+  chain log_output_hook {
+    type filter hook output priority 0
+    policy accept
+    log prefix "OUTPUT "
+  }
+
+  chain log_forward_hook {
+    type filter hook forward priority 0
+    policy accept
+    log prefix "FORWARD "
+  }
+
+  chain log_prerouting_hook {
+    type filter hook prerouting priority 0
+    policy accept
+    log prefix "PREROUTING "
+  }
+
+  chain log_postrouting_hook {
+    type filter hook postrouting priority 0
+    policy accept
+    log prefix "POSTROUTING "
+  }
+}
+
+# dont change 
+table fw_default {
+
+  chain prerouting {
+    type nat hook prerouting priority 0; policy accept;  
+  }
+
+  chain postrouting {
+    type nat hook postrouting priority 0; policy accept;  
+    masquerade
+  }
+
+}
